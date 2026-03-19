@@ -1,0 +1,29 @@
+[{'input_path': 'test_small.jpg', 'page_index': None, 'doc_preprocessor_res': {'input_path': None, 'page_index': None, 'input_img': array([[[0, ..., 0],
+        ...,
+        [0, ..., 0]],
+
+       ...,
+
+       [[0, ..., 0],
+        ...,
+        [0, ..., 0]]], shape=(100, 100, 3), dtype=uint8), 'model_settings': {'use_doc_orientation_classify': True, 'use_doc_unwarping': True}, 'angle': 0, 'rot_img': array([[[0, ..., 0],
+        ...,
+        [0, ..., 0]],
+
+       ...,
+
+       [[0, ..., 0],
+        ...,
+        [0, ..., 0]]], shape=(100, 100, 3), dtype=uint8), 'output_img': array([[[0, ..., 0],
+        ...,
+        [0, ..., 0]],
+
+       ...,
+
+       [[0, ..., 0],
+        ...,
+        [0, ..., 0]]], shape=(100, 100, 3), dtype=uint8)}, 'dt_polys': [array([[ 0, 26],
+       ...,
+       [ 0, 60]], shape=(4, 2), dtype=int16)], 'model_settings': {'use_doc_preprocessor': True, 'use_textline_orientation': False}, 'text_det_params': {'limit_side_len': 64, 'limit_type': 'min', 'thresh': 0.3, 'max_side_limit': 4000, 'box_thresh': 0.6, 'unclip_ratio': 1.5}, 'text_type': 'general', 'text_rec_score_thresh': 0.0, 'return_word_box': False, 'rec_texts': ['TEST'], 'rec_scores': [0.9999130964279175], 'rec_polys': [array([[ 0, 26],
+       ...,
+       [ 0, 60]], shape=(4, 2), dtype=int16)], 'vis_fonts': [<paddlex.utils.fonts.Font object at 0x000001E2DCD04690>], 'textline_orientation_angles': [-1], 'rec_boxes': array([[ 0, ..., 60]], shape=(1, 4), dtype=int16)}]

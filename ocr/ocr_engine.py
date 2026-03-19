@@ -56,13 +56,42 @@ def run_ocr(image_path: str) -> List[Dict[str, Any]]:
     result = ocr.ocr(image_path)
     blocks: List[Dict[str, Any]] = []
 
-    for line in result:
-        for word in line:
-            blocks.append({
-                "text": word[1][0],
-                "confidence": word[1][1],
-                "bbox": word[0],
-            })
+    if result is None:
+        return []
+    
+    # Handle PaddleOCR 3.x / PaddleX format where result is a list of dicts
+    # Each dict: {'input_path': ..., 'page_index': ..., 'res': ...}
+    if result and isinstance(result[0], dict) and "res" in result[0]:
+        blocks_data = []
+        for page in result:
+            res = page.get("res")
+            if isinstance(res, dict):
+                # New dictionary-based format
+                texts = res.get("rec_texts", [])
+                scores = res.get("rec_scores", [])
+                boxes = res.get("rec_boxes", res.get("det_polygons", []))
+                for i in range(len(texts)):
+                    blocks_data.append({
+                        "text": texts[i],
+                        "confidence": scores[i] if i < len(scores) else 0,
+                        "bbox": boxes[i] if i < len(boxes) else [],
+                    })
+            elif isinstance(res, list):
+                # Old list-based format wrapped in dict
+                for item in res:
+                    if isinstance(item, dict):
+                        blocks_data.append({
+                            "text": item.get("text", ""),
+                            "confidence": item.get("confidence", 0),
+                            "bbox": item.get("bbox", []),
+                        })
+                    elif isinstance(item, (list, tuple)) and len(item) > 1:
+                        blocks_data.append({
+                            "text": item[1][0],
+                            "confidence": item[1][1],
+                            "bbox": item[0],
+                        })
+        return blocks_data
 
     return blocks
 

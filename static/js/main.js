@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // GSAP Animations
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
     // Reveal Text Animation
     gsap.utils.toArray('.reveal-text').forEach(text => {
@@ -45,8 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     const resultsArea = document.getElementById('results-area');
     const resultsTbody = document.getElementById('results-tbody');
+    const resInvoiceNo = document.getElementById('res-invoice-no');
+    const resDate = document.getElementById('res-date');
+    const resTotal = document.getElementById('res-total');
+    const exportCsvBtn = document.getElementById('export-csv');
+    const exportJsonBtn = document.getElementById('export-json');
 
     let currentFile = null;
+    let currentData = null; // Store for export
     let costChart = null;
 
     // Drag & Drop Handlers
@@ -120,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.error) {
                 alert('Error: ' + data.error);
             } else {
+                currentData = data;
                 displayResults(data);
             }
         } catch (error) {
@@ -135,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsArea.classList.remove('hidden');
         resultsTbody.innerHTML = '';
         
+        // Populate badges
+        resInvoiceNo.textContent = data.invoice_number || 'N/A';
+        resDate.textContent = data.date || 'N/A';
+        resTotal.textContent = data.grand_total ? `$${data.grand_total.toFixed(2)}` : 'N/A';
+
         const labels = [];
         const totals = [];
 
@@ -157,8 +169,43 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChart(labels, totals);
 
         // Scroll to results
-        gsap.to(window, {duration: 1, scrollTo: "#results-area"});
+        gsap.to(window, {duration: 1, scrollTo: {y: "#results-area", offsetY: 80}, ease: "power2.inOut"});
     }
+
+    // Export Functionality
+    exportCsvBtn.addEventListener('click', () => {
+        if (!currentData) return;
+        const headers = ['Description', 'Quantity', 'Unit Price', 'Total'];
+        const rows = currentData.line_items.map(item => [
+            `"${item.description || ''}"`,
+            item.qty || 0,
+            item.unit_price || 0,
+            item.total || 0
+        ]);
+        
+        let csvContent = "data:text/csv;charset=utf-8," 
+            + headers.join(",") + "\n"
+            + rows.map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `invoice_${currentData.invoice_number || 'data'}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    exportJsonBtn.addEventListener('click', () => {
+        if (!currentData) return;
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData, null, 2));
+        const link = document.createElement("a");
+        link.setAttribute("href", dataStr);
+        link.setAttribute("download", `invoice_${currentData.invoice_number || 'data'}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 
     function updateChart(labels, values) {
         const ctx = document.getElementById('costChart').getContext('2d');

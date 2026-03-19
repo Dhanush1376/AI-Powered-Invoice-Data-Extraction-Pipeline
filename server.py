@@ -4,12 +4,16 @@ import json
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
-# Import existing logic
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from preprocessing.preprocess import preprocess_image
 from ocr.ocr_engine import run_ocr
 from line_items.table_extraction import group_text_by_rows, parse_row_by_columns
 from validation.validate import is_valid_line_item
 from utils.cleaners import clean_description
+from utils.extraction_utils import extract_invoice_number, extract_date, extract_total_amount
 
 app = Flask(__name__)
 
@@ -64,16 +68,24 @@ def upload_file():
                     item["description"] = clean_description(item["description"])
                     final_items.append(item)
             
+            # Global Extraction
+            invoice_no = extract_invoice_number(blocks)
+            invoice_date = extract_date(blocks)
+            grand_total = extract_total_amount(blocks) or sum([item["total"] for item in final_items if item["total"]])
+            
             # Return results
             return jsonify({
                 "task_id": task_id,
-                "invoice_number": "AUTO_DETECTED", # Placeholder or extracted
+                "invoice_number": invoice_no,
+                "date": invoice_date,
+                "grand_total": grand_total,
                 "line_items": final_items,
                 "processed_image_url": f"/uploads/{task_id}_processed.{ext}"
             })
             
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            logger.error(f"Extraction failed for task {task_id}: {str(e)}", exc_info=True)
+            return jsonify({"error": f"Processing failed: {str(e)}"}), 500
     
     return jsonify({"error": "Invalid file type"}), 400
 

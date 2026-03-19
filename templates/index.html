@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvoExtract | Premium AI Invoice Processing</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    <div class="blob-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="logo">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>InvoExtract</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#tool">Extract Now</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="hero-section">
+            <div class="hero-content">
+                <h1 class="reveal-text">Transform Invoices into <span class="gradient-text">Structured Intelligence.</span></h1>
+                <p class="fade-in">Automated, high-precision data extraction powered by advanced OCR and NLP. Fast, secure, and professional.</p>
+                <div class="cta-group fade-in">
+                    <a href="#tool" class="btn btn-primary">Try Explorer <i class="fas fa-arrow-right"></i></a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual fade-in">
+                <div class="glass-card main-card">
+                    <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Invoice Visualization" class="hero-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features-section">
+            <h2 class="section-title reveal-text">Core Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <i class="fas fa-microchip feature-icon"></i>
+                    <h3>Advanced OCR</h3>
+                    <p>High-accuracy text detection using PaddleOCR for multi-language and complex layout support.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <i class="fas fa-layer-group feature-icon"></i>
+                    <h3>Smart Table Parsing</h3>
+                    <p>Intelligent grouping of line items based on spatial coordinates and layout analysis.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <i class="fas fa-broom feature-icon"></i>
+                    <h3>Data Sanitization</h3>
+                    <p>Automatic cleaning of descriptions and normalization of currency and quantities.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tool Section -->
+        <section id="tool" class="tool-section">
+            <div class="glass-container">
+                <h2 class="section-title reveal-text">Extraction Explorer</h2>
+                
+                <div class="upload-area glass-card" id="drop-zone">
+                    <input type="file" id="file-input" hidden accept="image/*">
+                    <div class="upload-placeholder" id="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Drop your invoice here</h3>
+                        <p>Supports JPG, PNG, JPEG</p>
+                        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                    </div>
+                    <div id="file-preview" class="file-preview hidden">
+                        <img id="image-preview" src="" alt="Preview">
+                        <div class="preview-info">
+                            <span id="filename">file.jpg</span>
+                            <button class="btn btn-primary" id="process-btn">Start Extraction</button>
+                            <button class="btn btn-danger" id="cancel-btn">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loader" class="loader-container hidden">
+                    <div class="spinner"></div>
+                    <p>Processing invoice... Extracting intelligence.</p>
+                </div>
+
+                <div id="results-area" class="results-area hidden">
+                    <div class="results-grid">
+                        <div class="results-table-container glass-card">
+                            <h3>Extracted Line Items</h3>
+                            <div class="table-wrapper">
+                                <table id="line-items-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="results-tbody">
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="results-charts glass-card">
+                            <h3>Cost Distribution</h3>
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="about">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>InvoExtract</span>
+            </div>
+            <p>© 2026 AI Invoice Pipeline Project. Built for professional precision.</p>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

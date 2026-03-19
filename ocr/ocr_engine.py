@@ -43,7 +43,7 @@ def _init_ocr() -> object:
         ) from exc
 
     # Initialize with sensible defaults; adjust parameters as needed.
-    _ocr = PaddleOCR(use_angle_cls=False, lang="en")
+    _ocr = PaddleOCR(use_angle_cls=False, lang="en", enable_mkldnn=False)
     return _ocr
 
 
